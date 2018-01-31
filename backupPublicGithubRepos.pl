@@ -8,9 +8,12 @@ use LWP::UserAgent ();
 # main
 #
 my @repoURLs;
-my $userName 		= "";						# update this
-my $githubUserName 	= (@ARGV) ? $ARGV[0] : $userName;		# override username with argument 
+my $userName 		= 'ademol';					# update this
+my $backupPath		= '.';						# update this
+my $githubUserName 	= ($ARGV[0]) ? $ARGV[0] : $userName;		# override username with argument 
+my $localBackupPath 	= ($ARGV[1]) ? $ARGV[1] : $backupPath;		# override path with argument 
 my $userAgent 		= "Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0";
+
 
 &check_githubName($githubUserName);
 &get_public_repo_names($githubUserName);
@@ -33,15 +36,17 @@ sub check_githubName {
 sub get_repo_content {
 	my $url = shift; 
 	(my $repoName) = $url =~ m|.*/(.*)|;
-	
-	print "[$url]\n";
+		
+	print "[$url][$localBackupPath]\n";
 
-	if ( -d $repoName ) {
+	if ( -d "$localBackupPath/$repoName" ) {
 		# repo already exist, just to pull
-		`cd $repoName && git pull `;
+		print "pulling [$repoName]\n";
+		`cd $localBackupPath && cd $repoName && git pull `;
 	} else {
+		print "cloning [$repoName]\n";
 		# repo needs to be cloned the first time
-		print `git clone $url`;
+		print `cd $localBackupPath && git clone $url`;
 	}
 }
 
