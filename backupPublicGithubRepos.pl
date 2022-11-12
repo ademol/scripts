@@ -15,18 +15,18 @@ my $localBackupPath 	= ($ARGV[1]) ? $ARGV[1] : $backupPath;		# override path wit
 my $userAgent 		= "Mozilla/5.0 (X11; Linux i686; rv:10.0) Gecko/20100101 Firefox/10.0";
 
 
-&check_githubName($githubUserName);
+&validate_githubName($githubUserName);
 &get_public_repo_names($githubUserName);
-foreach my $repoURL ( @repoURLs ) {
-	&get_repo_content($repoURL);
+foreach my $repoURL ( @repoURLs ) { 
+	&get_repo_content($repoURL); 
 }
 #
 #
 #
 
-sub check_githubName {
+sub validate_githubName {
 	my $name = shift;
-	if ( $name eq "" ) {
+	if ($name eq "") {
 		print "Error: need a GitHub username !\n";
 		print "Either specify as argument or set the \$userName variable\n";
 		exit;
