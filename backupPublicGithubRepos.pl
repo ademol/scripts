@@ -31,6 +31,12 @@ sub validate_githubName {
 		print "Either specify as argument or set the \$userName variable\n";
 		exit;
 	}
+
+
+	my $url = "https://github.com/$name";
+	(my $responseContent, my $error) = &get_url_content($url);
+
+	die "[$url] : $error" if $error;
 }
 
 sub get_repo_content {
@@ -54,20 +60,13 @@ sub get_public_repo_names {
 	my $userName 	= shift;
 	my $urlPre 	= 'https://github.com';
 	my $urlPost	= '?tab=repositories';
-	my $responseContent;
 
 	# 
 	my $url		= $urlPre . "/" . $userName . $urlPost;
-	my $ua 		= LWP::UserAgent->new;
-	$ua->agent("$userAgent");
-	my $response 	= $ua->get($url);
 
- 	if ($response->is_success) {
-     		$responseContent = $response->decoded_content;
- 	}
- 	else {
-     		die $response->status_line;
- 	}
+	(my $responseContent, my $error) = &get_url_content($url);
+
+	die "[$url] : $error" if $error;
 
 	while( $responseContent =~ /^(.*)/mg ) {
 		my $line = $1;
@@ -77,4 +76,25 @@ sub get_public_repo_names {
 			push @repoURLs,"$urlPre$1";
 		}
 	}
+}
+
+sub get_url_content {
+	
+	my $url		= shift;
+
+	my $ua 		= LWP::UserAgent->new;
+	$ua->agent("$userAgent");
+	my $response 	= $ua->get($url);
+
+	my $responseContent;
+	my $error;
+
+ 	if ($response->is_success) {
+     		$responseContent = $response->decoded_content;
+ 	}
+ 	else {
+     		$error = $response->status_line;
+ 	}
+
+	return $responseContent, $error;
 }
